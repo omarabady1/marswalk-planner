@@ -48,12 +48,12 @@ button, input, select { font: inherit; color: inherit; }
 .status { margin: 0; color: var(--muted); font-size: 14px; text-align: right; }
 .status.error { color: var(--nogo); }
 
-.viewswitch, .seg { display: inline-flex; background: var(--basalt); border: 1px solid var(--line); border-radius: 6px; padding: 2px; }
-.viewswitch button, .seg button {
+.seg { display: inline-flex; background: var(--basalt); border: 1px solid var(--line); border-radius: 6px; padding: 2px; }
+.seg button {
   border: 0; background: none; padding: 5px 14px; border-radius: 4px; cursor: pointer; color: var(--muted);
   font-stretch: var(--semi); font-weight: 600;
 }
-.viewswitch button[aria-pressed="true"], .seg button[aria-pressed="true"] { background: var(--raised); color: var(--text); }
+.seg button[aria-pressed="true"] { background: var(--raised); color: var(--text); }
 .panels-btn {
   display: inline-flex; align-items: center; gap: 8px; padding: 6px 12px; border-radius: 6px;
   border: 1px solid var(--line); background: var(--basalt); color: var(--muted); cursor: pointer;
@@ -104,7 +104,10 @@ input[type=range] { width: 100%; }
 .tag.target, .pin.target { background: var(--gold); }
 
 /* ---------- stage (map / 3D) ---------- */
-.stage { position: relative; min-height: 0; overflow: hidden; container-type: inline-size; }   /* the helmet display sizes to it */
+.stage {
+  position: relative; min-height: 0; overflow: hidden; container-type: inline-size;   /* the helmet display sizes to it */
+  --dock-h: 58px; --above-dock: calc(var(--dock-h) + 22px);   /* view switch height; bottom of what sits above it */
+}
 #map, #view3d { position: absolute; inset: 0; }
 #map { background: #3b2a20; }
 #view3d { background: var(--sky); cursor: grab; }
@@ -148,8 +151,30 @@ input[type=range] { width: 100%; }
 .legend i { display: inline-block; width: 8px; height: 8px; border-radius: 2px; margin-right: 5px; vertical-align: 0; }
 .legend i.dot { border-radius: 50%; border: 1px solid #fff; }
 
+/* View switch: a big dock at the bottom centre of the view, the current view lit in cyan.
+   Everything else at the bottom (player, helmet display, readout) sits above it. */
+.viewdock {
+  position: absolute; left: 50%; bottom: 14px; translate: -50% 0; z-index: 750;
+  display: flex; gap: 4px; padding: 5px; height: var(--dock-h);
+  background: rgba(20, 24, 29, .94); border: 1px solid var(--line); border-radius: 14px;
+  box-shadow: 0 6px 24px rgba(0, 0, 0, .5); backdrop-filter: blur(6px);
+}
+.viewdock button {
+  display: inline-flex; align-items: center; gap: 9px; padding: 0 18px; border: 0; border-radius: 10px;
+  background: none; color: var(--text); cursor: pointer; white-space: nowrap;
+  font-size: 16px; font-weight: 650; font-stretch: var(--semi);
+  transition: background-color .15s, color .15s;
+}
+.viewdock button:hover:not(:disabled):not([aria-pressed="true"]) { background: var(--raised); }
+.viewdock button[aria-pressed="true"] { background: var(--cyan); color: var(--basalt); }
+.viewdock button:disabled { color: var(--muted); cursor: not-allowed; }
+.viewdock svg { width: 22px; height: 22px; flex: none; fill: none; stroke: currentColor; stroke-width: 1.7; stroke-linejoin: round; }
+.viewdock span { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+.viewdock small { display: none; font-size: 11px; font-weight: 500; }
+.viewdock button:disabled small { display: block; }
+
 .readout {
-  position: absolute; left: 12px; bottom: 34px; z-index: 600; pointer-events: none;
+  position: absolute; left: 12px; bottom: var(--above-dock); z-index: 600; pointer-events: none;
   background: rgba(27, 31, 36, .9); border-radius: 6px; padding: 5px 10px; font-size: 13px;
 }
 .readout small { display: block; color: var(--muted); font-size: 12px; }
@@ -189,7 +214,7 @@ input[type=range] { width: 100%; }
 
 /* ---------- helmet display (playback) ---------- */
 .hud {
-  position: absolute; left: 12px; bottom: 34px; z-index: 700; width: 250px;
+  position: absolute; left: 12px; bottom: var(--above-dock); z-index: 700; width: 250px;
   background: rgba(20, 24, 29, .88); border: 1px solid rgba(98, 214, 232, .45); border-radius: 10px;
   padding: 12px 14px; color: var(--text); backdrop-filter: blur(4px);
 }
@@ -225,7 +250,8 @@ input[type=range] { width: 100%; }
 .hud-photo figcaption { font-size: 12px; color: var(--muted); margin-top: 4px; }
 
 .player {
-  position: absolute; right: 12px; bottom: 34px; z-index: 700; width: min(520px, calc(100% - 24px));
+  position: absolute; left: 50%; translate: -50% 0; bottom: var(--above-dock); z-index: 700;   /* centred on the view dock */
+  width: min(520px, calc(100% - 24px));
   display: flex; align-items: center; gap: 10px;
   background: rgba(27, 31, 36, .92); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px;
 }
@@ -248,7 +274,7 @@ input[type=range] { width: 100%; }
 /* ---------- side panels hidden (button in the top bar, or during a walk) ---------- */
 body.panels-hidden .rail { display: none; }
 /* The brand and status line go too. Two rows on one left edge, so nothing can overlap at any width:
-   row 1 = view buttons + Show panels (zoom or globe button at the far right),
+   row 1 = Show panels (zoom or globe button at the far right; the view switch stays at the bottom),
    row 2 = base map + layer buttons, legends under them. */
 body.panels-hidden .topbar { display: contents; }
 body.panels-hidden .brand, body.panels-hidden .status { display: none; }
@@ -361,24 +387,25 @@ body.panels-hidden .player { width: min(600px, calc(100% - 24px)); }
   .brand h1 { font-size: 20px; }
   .topbar { grid-template-columns: 1fr; gap: 10px; }
   .topctl { justify-self: start; }
-  .viewswitch button { white-space: nowrap; padding: 5px 12px; }
+  .stage { --dock-h: 50px; }
+  .viewdock button { padding: 0 10px; gap: 6px; font-size: 14px; }
+  .viewdock svg { width: 18px; height: 18px; }
   .toolbar { right: 56px; }
   .chips button { padding: 5px 8px; white-space: nowrap; }
   #legendCuriosity { display: none; }
   /* panels hidden: row 1 must fit on one line beside the zoom control, so tighter view buttons
      and an icon-only Show panels (its label stays for screen readers) */
-  body.panels-hidden .viewswitch button { padding: 5px 10px; }
   body.panels-hidden .panels-btn { padding: 6px 9px; }
   body.panels-hidden #btnPanelsLabel { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
   .player .check { display: none; }   /* follow stays on */
   .speed-name { display: none; }
   .speed input { width: 60px; }
 }
-/* View too narrow for the helmet display (250 px, left) beside the player (right), whether the
-   window is small or the side panels take the room: it becomes a low strip above the player,
-   readings on the left and Curiosity's photo beside them, so most of the view stays clear. */
-@container (max-width: 900px) {
-  .hud { left: 12px; right: 12px; width: auto; bottom: 98px; padding: 8px 12px; }
+/* View too narrow for the helmet display (250 px, left) beside the centred player (up to 600 px),
+   whether the window is small or the side panels take the room: it becomes a low strip above the
+   player, readings on the left and Curiosity's photo beside them, so most of the view stays clear. */
+@container (max-width: 1140px) {
+  .hud { left: 12px; right: 12px; width: auto; bottom: calc(var(--above-dock) + 64px); padding: 8px 12px; }
   .hud:not([hidden]) { display: grid; grid-template-columns: minmax(0, 1fr) auto; column-gap: 12px; align-content: start; }
   .hud > :not(.hud-photo) { grid-column: 1; }
   .hud-clock span { font-size: 26px; }
@@ -390,12 +417,6 @@ body.panels-hidden .player { width: min(600px, calc(100% - 24px)); }
   .hud-photo { grid-column: 2; grid-row: 1 / span 4; margin: 0; width: min(42cqw, 300px); }
   .hud-photo img, .hud-photo canvas.full { aspect-ratio: auto; height: 128px; }
   .hud-photo figcaption { display: -webkit-box; -webkit-box-orient: vertical; -webkit-line-clamp: 2; line-clamp: 2; overflow: hidden; font-size: 11px; }
-}
-/* panels hidden and no room for the globe button beside the view buttons: it moves down to the
-   right end of row 2, and the layer buttons wrap before it */
-@container (max-width: 560px) {
-  body.panels-hidden .globe-btn { top: 57px; }
-  body.panels-hidden .stage[data-view="3d"] .toolbar { right: 170px; }
 }
 /* phone width: too narrow side by side, so the photo goes back under the readings, shorter */
 @container (max-width: 480px) {

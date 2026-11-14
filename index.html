@@ -31,11 +31,6 @@
       </div>
     </div>
     <div class="topctl">
-      <div class="viewswitch" role="group" aria-label="View">
-        <button type="button" id="btnMap" aria-pressed="true">Map</button>
-        <button type="button" id="btn3D" aria-pressed="false">3D terrain</button>
-        <button type="button" id="btnPOV" aria-pressed="false" disabled title="Plan a route first">Astronaut view</button>
-      </div>
       <button type="button" id="btnPanels" class="panels-btn" aria-expanded="true" aria-controls="railLeft railRight">
         <svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5"/><path d="M5 2.5v11M11 2.5v11"/></svg>
         <span id="btnPanelsLabel">Hide panels</span>
@@ -121,6 +116,22 @@
       </div>
 
       <div class="readout" id="readout" hidden></div>
+
+      <!-- How to look at the walk: big switch at the bottom centre of the view -->
+      <div class="viewdock" role="group" aria-label="View">
+        <button type="button" id="btnMap" aria-pressed="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 6.5 9 4l6 2.5L21 4v13.5L15 20l-6-2.5L3 20z"/><path d="M9 4v13.5M15 6.5V20"/></svg>
+          <span>Map</span>
+        </button>
+        <button type="button" id="btn3D" aria-pressed="false">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 19 8.5 8l4 6 3-4L22 19z"/><circle cx="17" cy="5.5" r="1.8"/></svg>
+          <span>3D terrain</span>
+        </button>
+        <button type="button" id="btnPOV" aria-pressed="false" disabled title="Plan a route first">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c-4.4 0-7.5 3.4-7.5 7.8V16c0 1.7 1.3 3 3 3h9c1.7 0 3-1.3 3-3v-5.2C19.5 6.4 16.4 3 12 3Z"/><path d="M7.5 11c0-2.6 2-4.5 4.5-4.5s4.5 1.9 4.5 4.5v.8c0 .9-.7 1.6-1.6 1.6H9.1c-.9 0-1.6-.7-1.6-1.6z"/></svg>
+          <span>Astronaut view<small>plan a route first</small></span>
+        </button>
+      </div>
 
       <!-- Helmet display during playback -->
       <div class="hud" id="hud" hidden>

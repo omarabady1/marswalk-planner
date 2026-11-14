@@ -101,7 +101,11 @@ function setupControls() {
   $('inSol').addEventListener('change', () => { renderWeather(); renderSummary(); });
 
   // Playback
-  $('btnPlay').addEventListener('click', () => (play.playing ? stopPlayback() : startPlayback()));
+  $('btnPlay').addEventListener('click', () => {
+    if (play.playing) { stopPlayback(); return; }
+    if (state.activeView === '3d') showView('pov');   // walks from the 3D view are seen at eye level
+    startPlayback();
+  });
   $('btnEnd').addEventListener('click', () => stopPlayback(true));
   $('btnPanels').addEventListener('click', () => setPanels(document.body.classList.contains('panels-hidden')));
   const showSpeed = () => {
